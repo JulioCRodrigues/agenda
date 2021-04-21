@@ -1,12 +1,34 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Button } from 'react-native'
-import { TextInput } from 'react-native-gesture-handler'
+import React, { useState, useEffect } from 'react'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import Database from '../database'
 
 
-export default ({ route, navigation }) => {
+export default function App({ route, navigation }) {
 
-  //altera o estado atual da variavel 
-  const [user, setUser] = useState(route.params ? route.params : {})
+  const id = route.params ? route.params.id : undefined;
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    if(!route.params) return;
+    setName(route.params.name);
+    setPhone(route.params.phone);
+  }, [route])
+
+  function nameChange(name) {
+    setName(name)
+  }
+
+  function phoneChange(phone) {
+    setPhone(phone)
+  }
+
+
+  async function saveItem(){ 
+    const listItem = {name, phone};
+    Database.saveItem(listItem, id)
+      .then(response => navigation.navigate("Agenda", listItem));
+  }
 
   return (
 
@@ -14,32 +36,24 @@ export default ({ route, navigation }) => {
       <Text>Nome: </Text>
       <TextInput
         style={style.input}
-        onChangeText={name => setUser({ ...user, name })}
         placeholder="Informe o nome"
-        value={user.name}
+        onChangeText={nameChange}
+        value={name}
+
       />
 
       <Text>Telefone: </Text>
       <TextInput
         style={style.input}
-        onChangeText={phone => setUser({ ...user, phone })}
         placeholder="Informe o número de telefone"
-        value={user.phone}
+        keyboardType="numeric"
+        onChangeText={phoneChange}
+        value={phone}
       />
 
-      <Text>Foto: </Text>
-      <TextInput
-        style={style.input}
-        onChangeText={avatarUrl => setUser({ ...user, avatarUrl })}
-        placeholder="Informe o link da imagem"
-        value={user.avatarUrl}
-      />
-      <Button 
-        title="Salvar"
-        onPress={() => {
-          navigation.goBack()
-        }}
-      />
+      <TouchableOpacity style={style.button} onPress={saveItem}>
+        <Text style={style.buttonText}>Salvar</Text>
+      </TouchableOpacity>
     </View>
 
   )
@@ -59,5 +73,23 @@ const style = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10
 
+  },
+
+  button: {
+    marginTop: 10,
+    height: 60,
+    backgroundColor: 'blue',
+    borderRadius: 10,
+    paddingHorizontal: 24,
+    fontSize: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 20,
+    shadowOpacity: 20,
+    shadowColor: '#ccc',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   }
 })

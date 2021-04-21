@@ -1,66 +1,56 @@
-import React, { useContext, useState } from 'react'
-import { View, Alert } from 'react-native'
-import { ListItem, Avatar, Icon } from 'react-native-elements'
-import { FlatList } from 'react-native-gesture-handler'
-import UsersContext from '../context/usersContext'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native'
+import AgendItem from './agendItem'
+import Database from '../database'
 
 
 
-export default props => {
+export default function agendList({route, navigation}) {
 
-  const { state, dispatch } = useContext(UsersContext)
-
+  const [users, setUsers] = useState([]);
   
- function confirmUserDeletion(user){
-   Alert.alert('Excluir usuário', 'Deseja excluir o usuário?', [
-     {
-       text: 'Sim',
-       onPress(){
-         dispatch({
-           type: 'deleteUser',
-           payload: user
-         })
-       }
-     }, 
+  useEffect(() => {
+      Database.getItems().then(users => setUsers(users));
+  }, [route]);
 
-     {
-       text: 'Não'
-     }
-   ])
- }
-
-  //função que randeriza a lista buscando os dados da nossa base local. 
-
-  function getUserItem({ item: user }) {
-    return (
-
-      <ListItem key={user.id} bottomDivider
-        onPress={() => props.navigation.navigate('Form', user)}
-
-      >
-
-        <Avatar source={{ uri: user.avatarUrl }} />
-
-        <ListItem.Content>
-          <ListItem.Title>{user.name}</ListItem.Title>
-          <ListItem.Subtitle>{user.phone}</ListItem.Subtitle>
-
-        </ListItem.Content>
-        <Icon name="edit" size={25} color="orange" onPress={() => props.navigation.navigate('Form')} />
-        <Icon name="delete" size={25} color="red" onPress={confirmUserDeletion} />
-      </ListItem>
-    )
-  }
 
   return (
+    <View style={style.container}>
 
-    <View>
-      <FlatList
-        keyExtractor={user => user.id.toString()}
-        data={state.users}
-        renderItem={getUserItem}
-      />
+      <StatusBar style="ligth" />
+      
+      <ScrollView
+        style={style.scrollContainer} contentContainerStyle={style.itemsContainer}>
+          
+          {
+            users.map(user => {
+              return <AgendItem key={user.id} id={user.id} user={user.name} navigation={navigation}/>
+            })
+          }
+      </ScrollView>
+
+
     </View>
-
   )
 }
+
+const style = StyleSheet.create({
+  container: {
+    backgroundColor: '#fff',
+    marginTop: 20,
+    width: '100%'
+  },
+  scrollContainer: {
+    
+    width: '100%'
+  },
+  itemsContainer: {
+    
+    marginTop: 10,
+    padding: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    alignItems: 'stretch',
+    backgroundColor: '#FFF'
+  },
+});

@@ -1,10 +1,10 @@
 import React from 'react'
-import { Button, Icon } from 'react-native-elements'
+import { Button , Icon} from 'react-native-elements'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import AgendHome from './views/agendList'
 import AgendForm from './views/agendForm'
-import { UsersProvider } from './context/usersContext'
+
 
 
 const Stack = createStackNavigator()
@@ -13,7 +13,6 @@ export default props => {
 
     return (
 
-        <UsersProvider>
             <NavigationContainer >
                 <Stack.Navigator initialRouteName="Agenda" screenOptions={screenOptions}>
                     <Stack.Screen
@@ -44,7 +43,7 @@ export default props => {
                         }} />
                 </Stack.Navigator>
             </NavigationContainer>
-        </UsersProvider>
+        
 
     )
 }
